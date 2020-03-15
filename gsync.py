@@ -5,24 +5,18 @@ import os.path
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
+from flask import Flask,jsonify,request,render_template
+from flask_restful import Resource, Api, reqparse
+
 
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = ['https://www.googleapis.com/auth/calendar']
 
-
-def main():
+def reminder(date,slot):
     creds = None
     # The file token.pickle stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
     # time.
-    date = 15
-    slot = 4
-    if slot==3:
-      slot=0
-    if slot==4:
-      slot=1
-    else:
-      slot=2
     if os.path.exists('token.pickle'):
         with open('token.pickle', 'rb') as token:
             creds = pickle.load(token)
@@ -41,20 +35,19 @@ def main():
     service = build('calendar', 'v3', credentials=creds)
 
     event = {
-      'summary': 'appointment with the doctor',
-      'location': 'clinic',
-      'description': 'get yourself checked ',
+      'summary': 'appointment with doctor',
+      'location': '',
+      'description': 'visit doctor and get yourself checked',
       'start': {
-        'dateTime': '2020-03-{}T09:00:30-0{}:30'.format(date,slot),
-        'timeZone': 'Asia/Kolkata',
+        'dateTime': '2020-05-11T09:00:30-00:30',
+        'timeZone': 'America/Los_Angeles',
       },
-
       'end': {
-        'dateTime': '2020-03-{}T09:00:30-0{}:30'.format(date,slot),
-        'timeZone': 'Asia/Kolkata',
+        'dateTime': '2020-05-11T09:00:30-00:30',
+        'timeZone': 'America/Los_Angeles',
       },
       'recurrence': [
-        'RRULE:FREQ=DAILY;COUNT=1'
+        ''
       ],
       'attendees': [
         {'email': 'pradyumn25jain@gmail.com'}
@@ -69,10 +62,37 @@ def main():
       },
     }
 
-    event = service.events().insert(calendarId='primary', body=event).execute()
-    print('Event created: %s' % (event.get('htmlLink')))
+    try:
+    	event = service.events().insert(calendarId='primary', body=event).execute()
+    	print('Event created: %s' % (event.get('htmlLink')))
+    	return "event created"
+    except:
+    	return "something went wrong"
 
 
+
+
+
+
+
+def main():
+
+
+    date = "23"
+    slot = "3"
+
+    if "3" in slot:
+      slot == 0
+    if "4" in slot:
+      slot == 1
+    else:
+      slot == 2
+
+    print("status {}".format(reminder(int(date),int(slot))))
+
+ 
+    
 
 if __name__ == '__main__':
     main()
+
